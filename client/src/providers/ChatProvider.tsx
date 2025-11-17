@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { useAuth } from "./AuthProvider"
 import axios from "axios"
 import { Chat, Game, Media, Message } from "../types"
-import { socket } from "../socket"
+import { socket, pollingManager } from "../socket"
 
 type ContextContent = {
   chats: Chat[]
@@ -262,15 +262,93 @@ export default function ChatProvider({ children }: ChatProviderProps) {
   useEffect(() => {
     if (authUser) {
       socket.emit("login", authUser._id)
+      
+      // Try to connect socket, but start polling fallback if connection fails
+      socket.connect()
+      
+      // Set up polling fallback for real-time updates
+      let socketConnected = false
+      let pollingSafetyTimer: NodeJS.Timeout
+      let lastUpdateTime = new Date().toISOString()
+      
+      const checkSocketAndStartPolling = () => {
+        if (socket.connected) {
+          socketConnected = true
+          pollingManager.stopAllPolling()
+        } else {
+          // Socket failed, start polling for messages
+          pollingManager.startPolling('messages', async () => {
+            if (!socketConnected) {
+              try {
+                const res = await axios.get(`/chat/updates?lastUpdate=${lastUpdateTime}`)
+                const { chats: updatedChats, hasUpdates, timestamp } = res.data
+                
+                if (hasUpdates && updatedChats.length > 0) {
+                  lastUpdateTime = timestamp
+                  
+                  setChats(currentChats => {
+                    // Merge updated chats with current chats
+                    const mergedChats = [...currentChats]
+                    
+                    updatedChats.forEach((updatedChat: Chat) => {
+                      const existingIndex = mergedChats.findIndex(c => c._id === updatedChat._id)
+                      if (existingIndex >= 0) {
+                        mergedChats[existingIndex] = updatedChat
+                      } else {
+                        mergedChats.push(updatedChat)
+                      }
+                    })
+                    
+                    // Sort by last message time
+                    return mergedChats.sort((a, b) => {
+                      const aTime = a.messages?.length ? new Date(a.messages[a.messages.length - 1].createdAt) : new Date(a.createdAt)
+                      const bTime = b.messages?.length ? new Date(b.messages[b.messages.length - 1].createdAt) : new Date(b.createdAt)
+                      return bTime.getTime() - aTime.getTime()
+                    })
+                  })
+                  
+                  // Play notification sound for new messages
+                  playPop()
+                }
+              } catch (error) {
+                console.warn("Polling failed:", error)
+              }
+            }
+          }, 3000)
+        }
+      }
+      
+      // Check socket connection after a delay
+      pollingSafetyTimer = setTimeout(checkSocketAndStartPolling, 2000)
+      
+      // Listen for socket connection events
+      socket.on('connect', () => {
+        socketConnected = true
+        pollingManager.stopAllPolling()
+        clearTimeout(pollingSafetyTimer)
+      })
+      
+      socket.on('disconnect', () => {
+        socketConnected = false
+        checkSocketAndStartPolling()
+      })
+      
       axios
         .get("/chat")
         .then((res) => {
           setChats(res.data)
           setLoading(false)
+          lastUpdateTime = new Date().toISOString()
         })
         .catch((err) => console.log(err))
+        
+      return () => {
+        clearTimeout(pollingSafetyTimer)
+        pollingManager.stopAllPolling()
+      }
     } else {
       setChats([])
+      pollingManager.stopAllPolling()
     }
   }, [authUser])
 

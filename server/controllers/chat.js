@@ -59,8 +59,42 @@ exports.readChat = asyncHandler(async (req, res) => {
 
 exports.deleteChat = asyncHandler(async (req, res) => {
   const { chatId } = req.params
-  const chat = await chatService.deleteChat(chatId, req.user._id, req.io)
-  res.json({ message: "Chat deleted with success", chat })
+  await chatService.deleteChat({
+    chatId,
+    authUserId: req.user._id,
+    io: req.io,
+  })
+  res.status(204).end()
+})
+
+// Polling endpoint for real-time updates fallback
+exports.getRecentUpdates = asyncHandler(async (req, res) => {
+  const { lastUpdate } = req.query
+  const authUserId = req.user._id
+  
+  try {
+    const recentChats = await chatService.getChatsForUser(authUserId)
+    
+    // If lastUpdate is provided, filter for chats updated after that time
+    let filteredChats = recentChats
+    if (lastUpdate) {
+      const lastUpdateDate = new Date(lastUpdate)
+      filteredChats = recentChats.filter(chat => 
+        new Date(chat.updatedAt) > lastUpdateDate || 
+        (chat.messages && chat.messages.length > 0 && 
+         new Date(chat.messages[chat.messages.length - 1].createdAt) > lastUpdateDate)
+      )
+    }
+    
+    res.json({
+      chats: filteredChats,
+      hasUpdates: filteredChats.length > 0,
+      timestamp: new Date().toISOString()
+    })
+  } catch (error) {
+    console.error("Polling update error:", error)
+    res.status(500).json({ error: "Failed to get updates" })
+  }
 })
 
 exports.removeUserFromChat = asyncHandler(async (req, res) => {
