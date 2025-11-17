@@ -6,7 +6,7 @@ const userService = require("../services/user")
 const options = {
   clientID: process.env.GITHUB_CLIENT_ID,
   clientSecret: process.env.GITHUB_CLIENT_SECRET,
-  callbackURL: process.env.SERVER_BASE_URL + "/api/user/github/login",
+  callbackURL: "https://chat-app-sandy-kappa.vercel.app/api/user/github/login",
   scope: ["user:email"],
   passReqToCallback: true,
 }
