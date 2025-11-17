@@ -6,8 +6,17 @@ import axios from "axios"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 
+// Set API base URL
+const backendURL = import.meta.env.VITE_SERVER_BASE_URL || "http://localhost:3000"
+const baseURL = backendURL + "/api"
+axios.defaults.baseURL = baseURL
 axios.defaults.withCredentials = true
-axios.defaults.baseURL = import.meta.env.VITE_SERVER_BASE_URL + "/api"
+
+// Debug logging for environment variables
+console.log("🔧 Environment:", import.meta.env.MODE)
+console.log("🌐 Backend URL:", backendURL)
+console.log("📡 API Base URL:", baseURL)
+console.log("🔍 Raw VITE_SERVER_BASE_URL:", import.meta.env.VITE_SERVER_BASE_URL)
 gsap.registerPlugin(ScrollTrigger)
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

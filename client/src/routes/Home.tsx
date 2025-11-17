@@ -5,7 +5,7 @@ import { Button } from "../components/ui/button"
 import { splitText } from "./Chat"
 import { useGSAP } from "@gsap/react"
 import gsap from "gsap"
-import preview from "../assets/preview.jpg"
+import preview from "../assets/preview.jpeg"
 
 export default function Home() {
   const { token } = useAuth()
@@ -75,9 +75,9 @@ function PreviewSection() {
 }
 
 import feature1 from "../assets/feature-1.jpg"
-import feature2 from "../assets/feature-2.jpg"
-import feature3 from "../assets/feature-3.jpg"
-import feature4 from "../assets/feature-4.jpg"
+import feature2 from "../assets/feature-2.jpeg"
+import feature3 from "../assets/feature-3.jpeg"
+import feature4 from "../assets/feature-4.jpeg"
 
 const features = [
   {
