@@ -38,10 +38,25 @@ app.use("/media/groups", express.static("media/groups"))
 
 // connect to db
 const mongoDb = process.env.MONGODB_URL
-const main = async () => mongoose.connect(mongoDb)
+console.log("MongoDB URL configured:", mongoDb ? "Yes" : "No")
+console.log("Environment variables loaded:", Object.keys(process.env).length)
+
+const main = async () => {
+  try {
+    await mongoose.connect(mongoDb)
+    console.log("✅ MongoDB connected successfully")
+  } catch (error) {
+    console.error("❌ MongoDB connection failed:", error.message)
+    throw error
+  }
+}
+
 main()
   .then(() => console.log("db connected"))
-  .catch((err) => console.log(err))
+  .catch((err) => {
+    console.error("Database connection error:", err)
+    console.log("MongoDB URL exists:", !!mongoDb)
+  })
 
 const handlers = require("./handlers")
 
@@ -60,6 +75,32 @@ app.get("/api/health", (req, res) => {
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development'
   })
+})
+
+// Database connection test endpoint
+app.get("/api/db-test", async (req, res) => {
+  try {
+    const dbState = mongoose.connection.readyState
+    const states = {
+      0: 'disconnected',
+      1: 'connected',
+      2: 'connecting',
+      3: 'disconnecting'
+    }
+    
+    res.json({
+      status: states[dbState] || 'unknown',
+      mongodb_url_configured: !!process.env.MONGODB_URL,
+      connection_state: dbState,
+      database_name: mongoose.connection.name || 'none'
+    })
+  } catch (error) {
+    res.status(500).json({
+      error: "Database test failed",
+      message: error.message,
+      mongodb_url_configured: !!process.env.MONGODB_URL
+    })
+  }
 })
 
 const userRouter = require("./routes/user")
