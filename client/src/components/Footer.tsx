@@ -14,12 +14,12 @@ export default function Footer() {
         <p className="text-neutral-400">
           Created by{" "}
           <a
-            href="https://github.com/nelrnd"
+            href="https://github.com/ankit227060"
             target="_blank"
             rel="noopener noreferrer"
             className="text-white font-medium hover:underline"
           >
-            Nel
+            Ankit
           </a>
         </p>
       </div>
