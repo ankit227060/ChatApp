@@ -39,14 +39,19 @@ app.use("/media/groups", express.static("media/groups"))
 // connect to db
 const mongoDb = process.env.MONGODB_URL
 console.log("MongoDB URL configured:", mongoDb ? "Yes" : "No")
+console.log("MongoDB URL (masked):", mongoDb ? mongoDb.replace(/:[^:@]*@/, ':****@') : "undefined")
 console.log("Environment variables loaded:", Object.keys(process.env).length)
 
 const main = async () => {
   try {
-    await mongoose.connect(mongoDb)
+    await mongoose.connect(mongoDb, {
+      serverSelectionTimeoutMS: 5000, // 5 second timeout
+      socketTimeoutMS: 45000,
+    })
     console.log("✅ MongoDB connected successfully")
   } catch (error) {
     console.error("❌ MongoDB connection failed:", error.message)
+    console.error("Error details:", error.name, error.code)
     throw error
   }
 }
@@ -56,6 +61,7 @@ main()
   .catch((err) => {
     console.error("Database connection error:", err)
     console.log("MongoDB URL exists:", !!mongoDb)
+    console.log("Error type:", err.name)
   })
 
 const handlers = require("./handlers")
