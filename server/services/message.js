@@ -10,8 +10,29 @@ async function createImages(files, chatId, authUserId) {
 
   const images = await Promise.all(
     files.map(async (file) => {
-      const url = file.path
-      const image = new Media({ type: "image", url, from: authUserId, chat: chatId })
+      let url
+      
+      // Handle different storage types
+      if (file.buffer) {
+        // Memory storage (production/serverless) - convert to base64 data URL
+        const base64 = file.buffer.toString('base64')
+        url = `data:${file.mimetype};base64,${base64}`
+      } else if (file.path) {
+        // Disk storage (local development) - use file path
+        url = file.path
+      } else {
+        throw new Error('File upload failed: no buffer or path available')
+      }
+      
+      const image = new Media({ 
+        type: "image", 
+        url, 
+        filename: file.originalname,
+        mimetype: file.mimetype,
+        size: file.size,
+        from: authUserId, 
+        chat: chatId 
+      })
       await image.save()
       await image.populate({ path: "from", select: "-password" })
       return image
