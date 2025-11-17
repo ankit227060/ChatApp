@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { BiLoaderAlt, BiLogoGithub, BiLogoGoogle } from "react-icons/bi"
 
-const SERVER_BASE_URL = import.meta.env.VITE_SERVER_BASE_URL
+const SERVER_BASE_URL = import.meta.env.VITE_SERVER_BASE_URL || "http://localhost:3000"
 
 const formSchema = z.object({
   email: z.string().min(1, "Email is required").email("Please enter a valid email"),
@@ -111,6 +111,14 @@ export default function Login() {
             </a>
           </Button>
         </div>
+
+        {/* Debug info */}
+        {import.meta.env.MODE === "development" && (
+          <div className="text-xs text-neutral-500 p-2 border border-neutral-800 rounded">
+            <p>Backend URL: {SERVER_BASE_URL}</p>
+            <p>Google OAuth: {SERVER_BASE_URL}/api/user/google/start</p>
+          </div>
+        )}
 
         <p className="text-neutral-400">
           Don't have an account yet?{" "}

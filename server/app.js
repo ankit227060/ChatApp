@@ -52,6 +52,16 @@ io.on("connection", (socket) => {
   socket.on("disconnect", handlers.handleDisconnect)
 })
 
+// Health check endpoint
+app.get("/api/health", (req, res) => {
+  res.json({ 
+    status: "OK", 
+    message: "Server is running",
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  })
+})
+
 const userRouter = require("./routes/user")
 const messageRouter = require("./routes/message")
 const chatRouter = require("./routes/chat")
