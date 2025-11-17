@@ -136,10 +136,15 @@ interface MessageImageProps {
 }
 
 function MessageImage({ image }: MessageImageProps) {
+  // Handle both base64 data URLs (serverless) and file paths (local development)
+  const imageUrl = image.url.startsWith('data:') 
+    ? image.url 
+    : SERVER_BASE_URL + "/" + image.url
+    
   return (
     <ImageWrapper image={image}>
       <div className="h-[12rem] md:h-[16rem] w-auto max-w-full overflow-hidden rounded-2xl shadow-xl">
-        <img src={SERVER_BASE_URL + "/" + image.url} alt="" className="block h-[12rem] md:h-[16rem] object-cover" />
+        <img src={imageUrl} alt="" className="block h-[12rem] md:h-[16rem] object-cover" />
       </div>
     </ImageWrapper>
   )

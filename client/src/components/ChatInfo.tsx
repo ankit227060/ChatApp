@@ -213,9 +213,13 @@ interface ImagePreviewProps {
 }
 
 function ImagePreview({ image, className }: ImagePreviewProps) {
+  const imageUrl = image.url.startsWith('data:') 
+    ? image.url 
+    : SERVER_BASE_URL + "/" + image.url
+    
   return (
     <li className="aspect-square overflow-hidden rounded-xl border border-neutral-800">
-      <img src={SERVER_BASE_URL + "/" + image.url} alt="" className={cn("w-full h-full object-cover", className)} />
+      <img src={imageUrl} alt="" className={cn("w-full h-full object-cover", className)} />
     </li>
   )
 }

@@ -65,7 +65,7 @@ export default function ImageViewerProvider({ children }: ImageViewerProvider) {
             </header>
             <main className="p-12 pt-0 flex-1 relative">
               <img
-                src={SERVER_BASE_URL + "/" + image?.url}
+                src={image?.url.startsWith('data:') ? image.url : SERVER_BASE_URL + "/" + image?.url}
                 alt=""
                 className="block absolute w-[95%] h-[95%] left-1/2 top-0 -translate-x-1/2 inset-0 aspect-square object-contain"
               />
