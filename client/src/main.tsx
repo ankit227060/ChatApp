@@ -12,7 +12,7 @@ const baseURL = backendURL + "/api"
 axios.defaults.baseURL = baseURL
 axios.defaults.withCredentials = true
 
-// Debug logging for environment variables
+// Debug logging for environment variables (Updated for Vercel deployment)
 console.log("🔧 Environment:", import.meta.env.MODE)
 console.log("🌐 Backend URL:", backendURL)
 console.log("📡 API Base URL:", baseURL)
