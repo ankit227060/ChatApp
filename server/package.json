@@ -4,7 +4,10 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app"
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "build": "echo 'Build completed'",
+    "vercel-build": "echo 'Vercel build completed'"
   },
   "author": "Ankit <mr.ankit910@gmail.com>",
   "license": "ISC",

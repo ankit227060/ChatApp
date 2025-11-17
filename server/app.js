@@ -68,4 +68,11 @@ app.use((err, req, res, next) => {
 })
 
 const PORT = process.env.PORT || 3000
-server.listen(PORT, () => console.log(`Server started at http://localhost:${PORT}`))
+
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  server.listen(PORT, () => console.log(`Server started at http://localhost:${PORT}`))
+}
+
+// Export for Vercel
+module.exports = app
