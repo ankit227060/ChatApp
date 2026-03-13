@@ -156,6 +156,7 @@ export default function ChatProvider({ children }: ChatProviderProps) {
 
     function onNewMessage(data: { message: Message; images: Media[]; links: Media[] }) {
       playPop()
+      console.log("New message received:", data)
       addMessage(data)
     }
 

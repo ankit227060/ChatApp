@@ -103,6 +103,8 @@ exports.createMessage = async ({ chatId, authUserId, text, files, action, game, 
 
   const res = { message: decodedMessage, images, links }
 
+  // Add a log to confirm the new-message event is emitted
+  console.log("Emitting new-message event for chatId:", chatId);
   emitNewMessage(res, authUserId, chatId, io)
 
   return res
