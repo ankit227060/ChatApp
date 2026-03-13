@@ -17,6 +17,7 @@ export type Message = {
   from: User
   chat: string
   timestamp: string
+  createdAt: string // Added createdAt property
   action?: Action
 }
 
@@ -42,6 +43,7 @@ export type Chat = {
   typingUsers: string[]
   unreadCount: number
   admin?: string
+  createdAt: string // Added createdAt property
 }
 
 export type Game = {
