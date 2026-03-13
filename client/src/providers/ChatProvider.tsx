@@ -36,7 +36,7 @@ export default function ChatProvider({ children }: ChatProviderProps) {
   const [loading, setLoading] = useState(true)
 
   const playPop = () => {
-    const pop = new Audio("/src/assets/pop.mp3")
+    const pop = new Audio("/sounds/pop.mp3")
     pop.play()
   }
 
